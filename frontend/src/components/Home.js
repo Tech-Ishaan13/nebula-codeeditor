@@ -35,6 +35,12 @@ const Home = () => {
       .catch((err) => console.error("Error fetching repos:", err));
   }, []);
 
+  const handleDirectJoin = (code) => {
+    localStorage.removeItem("joinedRepoCode");
+    localStorage.setItem("joinedRepoCode", code);
+    window.location.href = `/workspace/${code}`;
+  };
+
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -170,8 +176,16 @@ const Home = () => {
           <h2>Your Repositories</h2>
           <ul>
             {repos.map((repo, idx) => (
-              <li key={idx}>
-                <strong>{repo.repoName}</strong> — Code: {repo.repoCode}
+              <li 
+                key={idx} 
+                onClick={() => handleDirectJoin(repo.repoCode)} 
+                style={{ cursor: "pointer", padding: "12px", marginBottom: "8px", borderRadius: "6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                title="Click to enter workspace directly"
+              >
+                <strong>📂 {repo.repoName}</strong>
+                <span style={{ fontSize: "12px", background: "#00ffae", color: "#000", padding: "4px 10px", borderRadius: "4px", fontWeight: "bold" }}>
+                  Enter Workspace (Code: {repo.repoCode})
+                </span>
               </li>
             ))}
           </ul>

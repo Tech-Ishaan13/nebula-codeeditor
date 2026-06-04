@@ -30,8 +30,8 @@ const defaultCodeTemplates = {
 
 const repoCode = localStorage.getItem("joinedRepoCode");
 
-const Workspace = () => {
-  const navigate = useNavigate(); // Add this for navigation
+const Workspace = ({ mode }) => {
+  const navigate = useNavigate();
   const [activePanel, setActivePanel] = useState("files");
   const [activeFile, setActiveFile] = useState("index.html");
   const [showModal, setShowModal] = useState(false);
@@ -58,7 +58,12 @@ const Workspace = () => {
   const [loadingAI, setLoadingAI] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isHoveringCopy, setIsHoveringCopy] = useState(false);
-  const [editorTheme, setEditorTheme] = useState("vs-dark");
+  const [editorTheme, setEditorTheme] = useState(mode === "light" ? "light" : "vs-dark");
+
+  // Sync editor theme with global app theme
+  useEffect(() => {
+    setEditorTheme(mode === "light" ? "light" : "vs-dark");
+  }, [mode]);
 
   // Add repository information state
   const [repoInfo, setRepoInfo] = useState({
@@ -145,6 +150,46 @@ const Workspace = () => {
         content,
       }),
     }).catch((err) => console.error("Error saving file:", err));
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const content = e.target.result;
+      const filename = file.name;
+
+      newlyCreatedRef.current[filename] = true;
+
+      // Update local state
+      const updated = { ...files, [filename]: content };
+      setFiles(updated);
+      setActiveFile(filename);
+
+      // Emit socket event to notify other users
+      socket.emit("file-created", {
+        repoCode,
+        file: filename,
+        content: content,
+      });
+
+      // Save to DB via API
+      const token = localStorage.getItem("authToken");
+      fetch(`${BASE_URL}/api/files/${repoCode}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          filename: filename,
+          content,
+        }),
+      }).catch((err) => console.error("Error saving uploaded file:", err));
+    };
+    reader.readAsText(file);
   };
 
   const [chatMessages, setChatMessages] = useState([
@@ -360,43 +405,54 @@ const Workspace = () => {
     e.preventDefault();
     if (!aiInput.trim()) return;
 
+    const activeCode = activeFile && files[activeFile] ? files[activeFile] : "";
+    const systemPrompt = {
+      role: "system",
+      content: `You are an AI programming assistant embedded in the NebulaCode collaborative editor.
+You have access to the file currently being edited: ${activeFile || "None"}.
+${activeCode ? `Here is the current code content of ${activeFile}:\n\`\`\`\n${activeCode}\n\`\`\`` : "There is no code in the editor currently."}
+Please help the user with their queries about this code or programming in general.`
+    };
+
     const userMessage = { role: "user", content: aiInput.trim() };
-    // setAiMessages("");
-    // setAiMessages((prev) => [...prev, userMessage]);
-    // setAiInput("");
+    setAiMessages((prev) => [...prev, userMessage]);
+    setAiInput("");
     setLoadingAI(true);
 
     try {
-      const response = await fetch(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
-
-            // `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "deepseek/deepseek-r1:free", // Replace with your chosen model
-            messages: [...aiMessages, userMessage],
-          }),
-        }
-      );
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(`${BASE_URL}/api/ai-chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          messages: [systemPrompt, ...aiMessages, userMessage],
+        }),
+      });
 
       const data = await response.json();
-      if (data && data.choices && data.choices[0]) {
-        const aiResponse = {
-          role: "assistant",
-          content: data.choices[0].message.content,
-        };
-        setAiMessages((prev) => [...prev, aiResponse]);
-        setAiInput("");
+      if (data.success && data.message) {
+        setAiMessages((prev) => [...prev, data.message]);
       } else {
-        console.error("Unexpected API response:", data);
+        setAiMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: "⚠️ AI service is unavailable. Please verify that OPENROUTER_API_KEY is configured in backend/.env",
+          },
+        ]);
       }
     } catch (error) {
-      console.error("Error calling OpenRouter API:", error);
+      console.error("Error calling AI Chat API:", error);
+      setAiMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "❌ Failed to connect to the AI service.",
+        },
+      ]);
     } finally {
       setLoadingAI(false);
     }
@@ -685,9 +741,24 @@ const Workspace = () => {
     return (
       <div>
         <h3>Your Files</h3>
-        <button className="chat-send-btn" onClick={() => setShowModal(true)}>
-          ➕ Add File
-        </button>
+        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+          <button className="chat-send-btn" onClick={() => setShowModal(true)} style={{ flex: 1, marginBottom: 0 }}>
+            ➕ Add File
+          </button>
+          <input
+            type="file"
+            id="file-upload"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
+          <button 
+            className="chat-send-btn" 
+            onClick={() => document.getElementById("file-upload").click()}
+            style={{ flex: 1, marginBottom: 0, backgroundColor: "#007bff", color: "white" }}
+          >
+            📤 Upload
+          </button>
+        </div>
         <ul className="file-list">
           {Object.keys(files).map((filename) => (
             <li
@@ -1049,19 +1120,11 @@ const Workspace = () => {
         <div className="file-sidebar">{renderSidebarContent()}</div>
 
         <div className="code-editor" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-          <div className="editor-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 16px", background: "#1e1e1e", borderBottom: "1px solid #333", color: "#ccc" }}>
+          <div className="editor-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 16px", background: mode === "light" ? "#f1f3f5" : "#1e1e1e", borderBottom: `1px solid ${mode === "light" ? "#dee2e6" : "#333"}`, color: mode === "light" ? "#495057" : "#ccc" }}>
             <span style={{ fontSize: "14px", fontWeight: "bold" }}>Workspace: {activeFile || "No file selected"}</span>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label style={{ marginRight: "8px", fontSize: "12px", color: "#888" }}>Theme: </label>
-              <select 
-                value={editorTheme} 
-                onChange={(e) => setEditorTheme(e.target.value)}
-                style={{ background: "#252526", color: "#ccc", border: "1px solid #3c3c3c", padding: "3px 8px", borderRadius: "4px", outline: "none", cursor: "pointer", fontSize: "12px" }}
-              >
-                <option value="vs-dark">Monaco Dark (vs-dark)</option>
-                <option value="light">Monaco Light (light)</option>
-              </select>
-            </div>
+            <span style={{ fontSize: "12px", color: mode === "light" ? "#6c757d" : "#888" }}>
+              {editorTheme === "light" ? "☀️ Light" : "🌙 Dark"} Theme
+            </span>
           </div>
           <div className="editor-pane" style={{ flex: 1, position: "relative" }}>
             {activeFile in files ? (

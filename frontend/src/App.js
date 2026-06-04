@@ -10,10 +10,19 @@ import Workspace from "./components/Workspace.js";
 
 const userContext = createContext();
 function App() {
-  const [mode, setMode] = useState("light");
+  const [mode, setMode] = useState(localStorage.getItem("themeMode") || "dark");
   const [namee, setNamee] = useState(null);
   const [authToken, setAuthToken] = useState(localStorage.getItem("authToken"));
   const navigate = useNavigate();
+
+  useEffect(() => {
+    localStorage.setItem("themeMode", mode);
+    document.body.className = mode;
+  }, [mode]);
+
+  const toggleMode = () => {
+    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  };
 
   useEffect(() => {
     setAuthToken(localStorage.getItem("authToken")); // Get token from localStorage
@@ -87,13 +96,13 @@ function App() {
           position: "relative",
         }}
       >
-        <Navbar title="Code Editor" mode={mode} />
+        <Navbar title="Code Editor" mode={mode} toggleMode={toggleMode} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/aboutt" element={<About />} /> {/* Ensure this matches the Navbar link */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/workspace/:repoName" element={<Workspace />} />
+          <Route path="/workspace/:repoName" element={<Workspace mode={mode} />} />
         </Routes>
       </div>
     </userContext.Provider>

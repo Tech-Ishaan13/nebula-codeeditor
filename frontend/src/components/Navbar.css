@@ -82,3 +82,47 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
+/* Dark mode navbar default */
+.navbar.navbar-dark {
+  background-color: #1e1e1e;
+}
+.navbar.navbar-dark .navbar-brand {
+  color: #00ffae;
+}
+.navbar.navbar-dark .nav-link {
+  color: #ccc;
+}
+.navbar.navbar-dark .nav-link:hover,
+.navbar.navbar-dark .nav-link.active-link {
+  color: #00ffae;
+}
+
+/* Light mode navbar */
+.navbar.navbar-light {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.navbar.navbar-light .navbar-brand {
+  color: #212529;
+}
+.navbar.navbar-light .nav-link {
+  color: #495057;
+}
+.navbar.navbar-light .nav-link:hover,
+.navbar.navbar-light .nav-link.active-link {
+  color: #0d6efd;
+}
+.navbar.navbar-light .login-btn {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+/* Light mode logout modal */
+body.light .logout-modal {
+  background-color: #ffffff;
+  color: #212529;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border: 1px solid #dee2e6;
+}

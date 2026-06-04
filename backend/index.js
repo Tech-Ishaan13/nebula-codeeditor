@@ -711,6 +711,64 @@ app.get("/api/chat/:repoCode", authenticateToken, async (req, res) => {
   }
 });
 
+// AI Chat Proxy Route
+app.post("/api/ai-chat", authenticateToken, async (req, res) => {
+  const { messages } = req.body;
+
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({
+      success: false,
+      message: "Messages array is required",
+    });
+  }
+
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    console.warn("AI Chat requested but OPENROUTER_API_KEY is not set in backend/.env");
+    return res.status(500).json({
+      success: false,
+      message: "OPENROUTER_API_KEY is not configured on the server.",
+    });
+  }
+
+  try {
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "google/gemini-2.0-flash-exp:free",
+        messages: messages,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const result = response.data;
+    if (result && result.choices && result.choices[0]) {
+      return res.status(200).json({
+        success: true,
+        message: result.choices[0].message,
+      });
+    } else {
+      console.error("Unexpected OpenRouter response:", result);
+      return res.status(502).json({
+        success: false,
+        message: "Invalid response from AI model",
+      });
+    }
+  } catch (error) {
+    console.error("AI execution error:", error.response?.data || error.message);
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.error?.message || "Hanging connection / service failure.",
+      error: error.message,
+    });
+  }
+});
+
 // Code Execution Route
 app.post("/api/run-code", authenticateToken, async (req, res) => {
   const { code, language, stdin } = req.body;

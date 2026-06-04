@@ -15,3 +15,261 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* ==========================================================================
+   Light Mode Theme CSS Overrides
+   ========================================================================== */
+
+body.light {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Home Page Light Mode */
+body.light .home-page {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+body.light .home-subtitle {
+  color: #6c757d;
+}
+body.light .home-form h2 {
+  color: #212529;
+}
+body.light .home-form input {
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+body.light .home-form input::placeholder {
+  color: #adb5bd;
+}
+body.light .repo-list h2 {
+  color: #212529;
+}
+body.light .repo-list li {
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* About Page Light Mode */
+body.light .about-page {
+  background-color: #f8f9fa;
+}
+body.light .about-container {
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+body.light .about-title,
+body.light .about-subtitle {
+  color: #212529;
+}
+body.light .about-description {
+  color: #495057;
+}
+body.light .about-features li {
+  color: #495057;
+}
+
+/* Login/Signup Page Light Mode */
+body.light .login-page,
+body.light .signup-page {
+  background-color: #f8f9fa;
+}
+body.light .login-left,
+body.light .signup-left {
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  color: #212529;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+}
+body.light .login-left h1,
+body.light .signup-left h1 {
+  color: #212529;
+}
+body.light .login-input,
+body.light .signup-input {
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+body.light .login-input::placeholder,
+body.light .signup-input::placeholder {
+  color: #adb5bd;
+}
+body.light .signup-text {
+  color: #495057;
+}
+
+/* Workspace Light Mode */
+body.light .workspace-container {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+body.light .vertical-toolbar {
+  background-color: #e9ecef;
+  border-right: 1px solid #dee2e6;
+}
+body.light .vertical-toolbar button {
+  color: #495057;
+}
+body.light .vertical-toolbar button:hover {
+  color: #000;
+}
+body.light .file-sidebar {
+  background-color: #f1f3f5;
+  color: #212529;
+  border-right: 1px solid #dee2e6;
+  border-top: 1px solid #dee2e6;
+}
+body.light .file-sidebar h3 {
+  color: #212529;
+}
+body.light .file-list li {
+  color: #495057;
+}
+body.light .file-list li:hover {
+  background-color: #e9ecef;
+}
+body.light .file-list li.active-file {
+  background-color: #00ffae;
+  color: #000;
+}
+body.light .code-editor {
+  background-color: #ffffff;
+  border-top: 2px solid #dee2e6;
+}
+body.light .editor-header {
+  background-color: #f1f3f5 !important;
+  border-bottom: 1px solid #dee2e6 !important;
+  color: #495057 !important;
+}
+body.light .editor-header select {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  border: 1px solid #ced4da !important;
+}
+body.light .chat-box h3,
+body.light .users-panel h3,
+body.light .settings-panel h3,
+body.light .ai-assistance-panel h3 {
+  color: #212529 !important;
+}
+body.light .chat-messages,
+body.light .ai-messages {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+}
+body.light .chat-message:not(.own) .chat-content {
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+body.light .chat-message:not(.own) .chat-content::after {
+  border-right-color: #ffffff;
+}
+body.light .chat-message-input,
+body.light .ai-input,
+body.light .stdin-input,
+body.light .password-input {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  border: 1px solid #ced4da !important;
+}
+body.light .repo-info {
+  background-color: #e9ecef;
+  color: #212529;
+}
+body.light .info-row span {
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+body.light .modal {
+  background-color: #ffffff;
+  color: #212529;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border: 1px solid #dee2e6;
+}
+body.light .modal input,
+body.light .modal select {
+  background-color: #ffffff;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+
+/* Light mode: Home page repo list hover */
+body.light .repo-list li:hover {
+  background-color: #e2e6ea;
+  transform: translateY(-1px);
+}
+
+/* Light mode: Output panel */
+body.light .output-panel {
+  background-color: #f8f9fa;
+}
+body.light .code-output {
+  background-color: #f1f3f5;
+  color: #212529;
+  border-top-color: #dee2e6;
+}
+body.light .run-controls {
+  background-color: #f8f9fa !important;
+  border-top-color: #dee2e6 !important;
+}
+body.light .run-controls button {
+  background-color: #198754;
+}
+
+/* Light mode: Home page logo icon */
+body.light .logo-icon {
+  color: #0d6efd;
+}
+
+/* Light mode: Active file in sidebar */
+body.light .file-sidebar li {
+  background-color: #e9ecef;
+  color: #212529;
+}
+body.light .file-sidebar li:hover {
+  background-color: #dee2e6;
+  color: #000;
+}
+
+/* Light mode: Chat area */
+body.light .chat-input-row {
+  background-color: #f8f9fa;
+  border-top-color: #dee2e6;
+}
+
+/* Light mode: Settings */
+body.light .settings-panel button {
+  background-color: #e9ecef;
+  color: #212529;
+  border: 1px solid #ced4da;
+}
+body.light .settings-panel .leave-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+
+/* Light mode: AI panel */
+body.light .ai-assistance-panel {
+  background-color: #f8f9fa;
+}
+body.light .ai-message.user {
+  color: #0d6efd;
+}
+body.light .ai-message.assistant {
+  color: #212529;
+}
+body.light .ai-submit-btn {
+  background-color: #0d6efd;
+}
+

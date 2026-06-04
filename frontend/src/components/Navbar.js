@@ -24,8 +24,7 @@ const Navbar = (props) => {
   return (
     <div>
       <nav
-        className="navbar navbar-expand-lg navbar-dark"
-        style={{ backgroundColor: "#1e1e1e" }}
+        className={`navbar navbar-expand-lg ${props.mode === "light" ? "navbar-light" : "navbar-dark"}`}
       >
         <div className="container-fluid">
           <div className="navbar-brand">NebulaCode</div>
@@ -58,13 +57,33 @@ const Navbar = (props) => {
                 </li>
               </ul>
             )}
-            {!hideLogoutPath && !hideNav && (
-              <button
-                className="login-btn"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Logout
-              </button>
+            {!hideLogoutPath && (
+              <div style={{ display: "flex", gap: "12px", alignItems: "center", marginLeft: "auto" }}>
+                <button
+                  onClick={props.toggleMode}
+                  style={{
+                    background: "none",
+                    border: "1px solid #444",
+                    color: props.mode === "light" ? "#333" : "#00ffae",
+                    backgroundColor: props.mode === "light" ? "#e0e0e0" : "#2a2a2a",
+                    padding: "6px 12px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: "bold"
+                  }}
+                >
+                  {props.mode === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+                </button>
+                {!hideNav && (
+                  <button
+                    className="login-btn"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Logout
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>
