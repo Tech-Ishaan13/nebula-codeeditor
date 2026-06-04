@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import http from "http";
 import { WebSocketServer } from "ws";
 import { setupWSConnection } from "@y/websocket-server/utils";
+import https from "https";
 
 dotenv.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Disable TLS verification for OpenRouter (dev only)
@@ -733,13 +734,13 @@ app.post("/api/ai-chat", authenticateToken, async (req, res) => {
   }
 
     try {
-    const https = require('https');
     const agent = new https.Agent({ rejectUnauthorized: false });
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "google/gemini-2.0-flash-exp:free",
+        model: "google/gemini-2.5-flash",
         messages: messages,
+        max_tokens: 4096,
       },
       {
         headers: {
