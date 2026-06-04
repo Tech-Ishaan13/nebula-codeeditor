@@ -11,6 +11,7 @@ import { WebSocketServer } from "ws";
 import { setupWSConnection } from "@y/websocket-server/utils";
 
 dotenv.config();
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Disable TLS verification for OpenRouter (dev only)
 
 // Server Configuration
 const app = express();
@@ -731,7 +732,9 @@ app.post("/api/ai-chat", authenticateToken, async (req, res) => {
     });
   }
 
-  try {
+    try {
+    const https = require('https');
+    const agent = new https.Agent({ rejectUnauthorized: false });
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
@@ -743,6 +746,7 @@ app.post("/api/ai-chat", authenticateToken, async (req, res) => {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
+        httpsAgent: agent,
       }
     );
 
