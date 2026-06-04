@@ -2,6 +2,10 @@
 
 A real-time collaborative code editor with AI assistance, built with React, Node.js, MongoDB, and WebSockets.
 
+## 🔗 Live Demo
+
+> **Try it now** → [https://nebulacode.vercel.app](https://nebulacode.vercel.app) *(no setup needed — just open and use!)*
+
 ---
 
 ## ✨ Features

@@ -12,7 +12,6 @@ import { setupWSConnection } from "@y/websocket-server/utils";
 import https from "https";
 
 dotenv.config();
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Disable TLS verification for OpenRouter (dev only)
 
 // Server Configuration
 const app = express();
@@ -47,9 +46,19 @@ async function connectToDatabase() {
   }
 }
 
-// CORS Configuration
+// CORS Configuration — allow localhost (dev) + any deployed frontend URL
+const allowedOrigins = [
+  "http://localhost:3000",
+  BASE_URL,
+].filter(Boolean);
+
 const corsOptions = {
-  origin: BASE_URL,
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error("Not allowed by CORS"));
+  },
   methods: "GET, POST, PUT, DELETE",
   credentials: true,
 };
@@ -85,7 +94,7 @@ function authenticateToken(req, res, next) {
 // Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: BASE_URL,
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,
   },
